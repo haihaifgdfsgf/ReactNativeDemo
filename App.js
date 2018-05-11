@@ -16,6 +16,7 @@ import {
     StatusBar,
     ListView,
     Image,
+    RefreshControl,
 } from 'react-native';
 
 const instructions = Platform.select({
@@ -31,6 +32,7 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props)
         this.state = {
+            refreshing:false,
             movies: new ListView.DataSource({
                 rowHasChanged: (row1, row2) => row1 !== row2
             })
@@ -65,7 +67,7 @@ export default class App extends Component<Props> {
     setView(movie) {
         return (
             <View style={styles.item}>
-              
+
                 <View style={styles.image_content}>
                     <Image style={styles.image} source={{uri: movie.images.large}}/>
                 </View>
@@ -80,13 +82,31 @@ export default class App extends Component<Props> {
             </View>
         )
     }
-
+    reloadWordData(){
+        this.setState({
+            refreshing:true,
+        });
+        setTimeout(()=>{
+            this.setState({
+                refreshing:false,
+            });
+        },10000)
+    }
     render() {
         return (
             <View style={styles.container}>
+
                 <ListView showsVerticalScrollIndicator={false}
                           dataSource={this.state.movies}
-                          renderRow={this.setView.bind(this)}/>
+                          renderRow={this.setView.bind(this)}
+                          refreshControl={
+                              <RefreshControl
+                                  colors={['#ff0000', '#00ff00','#0000ff','#3ad564','#000000']}
+                                  refreshing={this.state.refreshing}
+                                  onRefresh={this.reloadWordData.bind(this)}
+                              />}
+                />
+
             </View>
         );
     }
